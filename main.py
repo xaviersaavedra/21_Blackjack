@@ -1,5 +1,3 @@
-from typing import Any
-
 import art
 import random
 colores = ['♥️', '♦️', '♠️', '♣️']
@@ -10,7 +8,7 @@ for color in colores:
         mazo.append({"carta":carta,"color":color})
 random.shuffle(mazo)
 suma_jugador = 0
-suma_maquina = 0
+suma_crupier = 0
 def repartir_cartas(mano):
     mano.append((random.choice(mazo)).copy())
 def calcular_suma(mano):
@@ -19,33 +17,52 @@ def calcular_suma(mano):
         suma += carta["carta"]
     return suma
 def mostrar_mesa():
-    print("Cartas del Jugador:", mano_jugador, "que suma:", suma_jugador)
-    print("Cartas de la maquina:", mano_maquina, "que suma:", suma_maquina)
-
-def maquina():
-    maquina = True
-    while maquina:
-        repartir_cartas(mano_maquina)
+    mostrar_jugador()
+    mostrar_crupier()
+def mostrar_jugador():
+    print(f"Cartas del Jugador: {mano_jugador}, que suma:{calcular_suma(mano_jugador)}")
+def mostrar_crupier():
+    print(f"Cartas del crupier: {mano_crupier}, que suma:{calcular_suma(mano_crupier)}")
+def jugador_pide_carta():
+    repartir_cartas(mano_jugador)
+    actualizar_suma()
+    mostrar_jugador()
+    as_interactivo()
+    actualizar_suma()
+    mostrar_crupier()
+def primera_mano():
+    repartir_cartas(mano_jugador)
+    repartir_cartas(mano_jugador)
+    repartir_cartas(mano_crupier)
+    actualizar_suma()
+    mostrar_jugador()
+    as_interactivo()
+    actualizar_suma()
+    mostrar_crupier()
+def crupier():
+    crupier_f = True
+    while crupier_f:
+        repartir_cartas(mano_crupier)
         actualizar_suma()
-        if suma_maquina > 21:
+        if suma_crupier > 21:
             mostrar_mesa()
             print("Jugador ganó")
-            maquina = False
-        elif suma_maquina == suma_jugador:
+            crupier_f = False
+        elif suma_crupier == suma_jugador:
             mostrar_mesa()
             print("Empate")
-            maquina = False
-        elif suma_maquina < 16:
-            maquina = True
+            crupier_f = False
+        elif suma_crupier < 16:
+            crupier_f = True
         else:
-            if suma_jugador > suma_maquina:
+            if suma_jugador > suma_crupier:
                 mostrar_mesa()
                 print("Jugador ganó")
-                maquina = False
+                crupier_f = False
             else:
                 mostrar_mesa()
                 print("Jugador perdió")
-                maquina = False
+                crupier_f = False
 def as_interactivo():
     for carta in mano_jugador:
         actualizar_suma()
@@ -54,61 +71,44 @@ def as_interactivo():
             if eleccion_as == "1":
                 carta["carta"] = 1
                 actualizar_suma()
-                print("Cartas del Jugador:", mano_jugador, "que suma:", suma_jugador)
+                mostrar_jugador()
 def actualizar_suma():
-    global suma_jugador, suma_maquina
+    global suma_jugador, suma_crupier
     suma_jugador = calcular_suma(mano_jugador)
-    suma_maquina = calcular_suma(mano_maquina)
-    return suma_jugador, suma_maquina
+    suma_crupier = calcular_suma(mano_crupier)
+    return suma_jugador, suma_crupier
 juego = True
 while juego:
     mano_jugador = []
-    mano_maquina = []
+    mano_crupier = []
     inicio = input("¿Hola Pá,querés jugar al Blackjack? y o n")
     if inicio == "y":
         print(art.logo)
-        repartir_cartas(mano_jugador)
-        repartir_cartas(mano_jugador)
-        repartir_cartas(mano_maquina)
-        actualizar_suma()
-        print("Cartas del Jugador:",mano_jugador,"que suma:",suma_jugador)
-        as_interactivo()
-        actualizar_suma()
-        print("Cartas de la maquina:",mano_maquina,"que suma:",suma_maquina)
+        primera_mano()
         if suma_jugador == 21:
-            print("Blackjack,Jugador gano")
+            print("Blackjack,Jugador ganó")
             continue
-        continuar = input("¿Queres una carta mas? y o n")
+        continuar = input("¿Querés una carta más? y o n")
         if continuar == "y":
-            repartir_cartas(mano_jugador)
-            actualizar_suma()
-            print("Cartas del Jugador:",mano_jugador,"que suma:",suma_jugador)
-            as_interactivo()
-            actualizar_suma()
-            print("Cartas de la maquina:", mano_maquina,"que suma:",suma_maquina)
-            suerte_de_pricipiante = True
-            while suerte_de_pricipiante:
+            jugador_pide_carta()
+            turno_jugador = True
+            while turno_jugador:
                 if suma_jugador > 21:
-                    print("Jugador perdio")
-                    suerte_de_pricipiante = False
+                    print("Jugador perdió")
+                    turno_jugador = False
                 elif suma_jugador == 21:
-                    maquina()
-                    suerte_de_pricipiante = False
+                    crupier()
+                    turno_jugador = False
                 else:
                     as_interactivo()
                     actualizar_suma()
-                    suerte = input("¿Queres otra carta? y o n")
+                    suerte = input("¿Querés otra carta? y o n")
                     if suerte == "n":
-                        maquina()
-                        suerte_de_pricipiante = False
+                        crupier()
+                        turno_jugador = False
                     elif suerte == "y":
-                        repartir_cartas(mano_jugador)
-                        actualizar_suma()
-                        print("Cartas del Jugador:", mano_jugador, "que suma:", suma_jugador)
-                        as_interactivo()
-                        actualizar_suma()
-                        print("Cartas de la maquina:", mano_maquina, "que suma:", suma_maquina)
+                        jugador_pide_carta()
         elif continuar == "n":
-            maquina()
+            crupier()
         else:
-            maquina()
+            crupier()
