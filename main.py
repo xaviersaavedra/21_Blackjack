@@ -41,7 +41,6 @@ def crupier(mano_jugador, mano_crupier, mazo):
     while crupier_f:
         repartir_cartas(mano_crupier, mazo)
 
-        # Calculamos las sumas aquí adentro usando la función existente
         suma_crupier = calcular_suma(mano_crupier)
         suma_jugador = calcular_suma(mano_jugador)
 
